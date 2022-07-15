@@ -37,6 +37,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
@@ -80,16 +81,21 @@ public class SearchFragment extends Fragment {
     public void getData(String query) {
         System.out.println("query====" + query);
         videoList.clear();
-        Disposable disposable = viewModel.getMovieListVM(query)
+        viewModel.getMovieListVM(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<MovieResponseBean>() {
+                .subscribe(new Observer<MovieResponseBean>() {
                     @Override
-                    public void accept(MovieResponseBean movieResponseBean) throws Throwable {
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        compositeDisposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull MovieResponseBean movieResponseBean) {
                         hideProgress();
                         //System.out.println("displayMessage=====" + movieResponseBean.meta.displayMessage);
                         //System.out.println("coverImage=====" + movieResponseBean.data.videos.get(0).coverImage.path);
-                        videoList = movieResponseBean.getData().getVideos();
+                        videoList.addAll(movieResponseBean.getData().getVideos());
 
                         if (videoList.size() == 0) {
                             binding.txtItemNotFound.setVisibility(View.VISIBLE);
@@ -100,13 +106,30 @@ public class SearchFragment extends Fragment {
                             binding.searchRecyclerView.setVisibility(View.VISIBLE);
                         }
                     }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+              /*  .subscribe(new Consumer<MovieResponseBean>() {
+                    @Override
+                    public void accept(MovieResponseBean movieResponseBean) throws Throwable {
+
+                    }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
                         Log.e("Throwable", throwable.getMessage(), throwable);
                     }
-                });
-        compositeDisposable.add(disposable);
+                });*/
+        //compositeDisposable.add(disposable);
     }
 
     public void setupAdapter() {
