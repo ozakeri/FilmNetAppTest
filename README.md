@@ -41,8 +41,6 @@ This application is complete
 You can use the following resources to access the APIs
 - Get coins route:
 https://filmnet.ir
-- Get a coin by ID route:
-https://api.coinpaprika.com/v1/coins/...
 
 
 ## Contact
