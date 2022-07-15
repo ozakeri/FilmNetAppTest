@@ -38,8 +38,8 @@ This application is complete
 
 
 ## Acknowledgements
-You can use the following resources to access the APIs
-- Get coins route:
+You can use the following resources to access videos
+- Get Videos:
 https://filmnet.ir
 
 
